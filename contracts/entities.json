@@ -1,0 +1,16 @@
+{
+  "schema_version": "1",
+  "domain": "民资科考船试航条件闭环",
+  "required_fields": [
+    "vessel_ref",
+    "inspection_ref",
+    "sea_area_ref",
+    "warning_ref",
+    "departure_at"
+  ],
+  "time_format": "ISO 8601 with offset",
+  "sample": {
+    "vessel_ref": "VESSEL-DEMO",
+    "sea_area_ref": "AREA-A"
+  }
+}

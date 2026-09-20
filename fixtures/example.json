@@ -1,4 +1,38 @@
 {
-  "vessel_ref": "VESSEL-DEMO",
-  "sea_area_ref": "AREA-A"
+  "voyage": {
+    "id": "VOY-2026-01",
+    "vessel_ref": "VESSEL-DEMO",
+    "sea_area_ref": "AREA-A",
+    "departure_at": "2026-09-10T08:00:00+08:00"
+  },
+  "subject": {
+    "id": "SUBJ-SAMPLE-01",
+    "voyage_id": "VOY-2026-01",
+    "name": "走航采样与冷藏联动",
+    "instrument_ids": ["TRAWL-S01", "COLD-C01"]
+  },
+  "experiment_run": {
+    "id": "RUN-S-01",
+    "protocol_ref": "PROTO-TRAWL-v2.1",
+    "parameters": {"拖速节": 4.5, "网深米": 20},
+    "ran_at": "2026-09-10T10:00:00+08:00"
+  },
+  "anomaly_reading": {
+    "metric": "舱温_C",
+    "raw_value": "8.7",
+    "recorded_at": "2026-09-10T11:02:00+08:00",
+    "is_anomaly": true,
+    "anomaly_reason": "开舱取样时温度瞬时跳变，原始读数保留",
+    "reviewed_by": "李复核",
+    "review_result": "确认异常"
+  },
+  "sample_trace": {
+    "sample_id": "SMP-01",
+    "storage_instrument_id": "COLD-C01",
+    "collected_at": "2026-09-10T10:35:00+08:00",
+    "handovers": [
+      {"seq": 1, "from_party": "采样组", "to_party": "冷藏管理员",
+       "handed_at": "2026-09-10T10:40:00+08:00", "condition": "完好"}
+    ]
+  }
 }

@@ -1,16 +1,61 @@
 {
-  "schema_version": "1",
-  "domain": "民资科考船试航条件闭环",
-  "required_fields": [
-    "vessel_ref",
-    "inspection_ref",
-    "sea_area_ref",
-    "warning_ref",
-    "departure_at"
-  ],
+  "schema_version": "2",
+  "domain": "科研载荷海试验收服务",
   "time_format": "ISO 8601 with offset",
+  "roles": {
+    "scientist": "海洋科研团队：录入航次、仪器、科目、观测、实验、读数、样本与授权",
+    "acceptance": "靠港验收人员：完成/判退科目、登记仪器逐航次验收结论、查看完整报告",
+    "owner": "船东：仅查看设备是否满足交付条件",
+    "researcher": "研究机构：在被授权范围内追溯样本来源与交接链"
+  },
+  "entities": {
+    "voyage": "航次（船舶、水域、开/到港时间），结论不可跨航次复用的边界",
+    "leg": "航段：航次内的航行区间，观测与实验必须挂在本航次航段上",
+    "instrument": "装船仪器，如走航采样仪、冷藏样本舱、定位设备",
+    "calibration_certificate": "校准证书，按航次签发，开航时须在有效期内且结论为合格",
+    "subject": "试航科目，关联本航次仪器集合；状态：进行中/已完成/未通过/待复测",
+    "observation_window": "海上观测时间窗，落在航段内，记录观测人与起止时间",
+    "experiment_run": "可复现实验记录：规程版本 protocol_ref + 参数快照 parameters(JSON)",
+    "reading": "实验读数；原始值 raw_value 不可改删；异常读数保留原始值并须登记 reviewed_by",
+    "sample": "样本：来源科目/实验/采集人/采集时间/存储仪器",
+    "sample_handover": "样本交接链：只追加，按 seq 记录双方、时间与状态",
+    "sample_grant": "研究机构样本授权，范围为单样本或整科目",
+    "instrument_validation": "仪器逐航次验收结论：通过/待复测/不通过；非通过必须填原因"
+  },
+  "subject_completion_rule": {
+    "scope": "只统计 subject.voyage_id 本航次的证书、航段内观测窗与实验记录",
+    "requirements": [
+      "每台关联仪器在本航次有合格且开航时有效的校准证书",
+      "每台关联仪器在本航次航段内有海上观测时间窗",
+      "每台关联仪器在本航次航段内有可复现实验记录",
+      "全部异常读数均已登记复核人(reviewed_by)与复核结论"
+    ],
+    "reuse": "其他航次的证书、观测、实验、验收结论一律不计入，禁止冒用"
+  },
+  "anomaly_rule": {
+    "immutability": "raw_value 原样保存，系统不提供修改/删除读数的接口",
+    "review": "is_anomaly=true 时复核人与复核结论成对出现，复核结论：确认异常/误报修正；复核登记后不可更改"
+  },
+  "views": {
+    "GET /voyages/{id}/delivery": "船东：仅 instrument 级 满足交付/暂不满足交付",
+    "GET /voyages/{id}/report": "验收：每台仪器的验证航段、证据核查、阻塞原因与验收结论",
+    "GET /samples/trace": "研究机构：仅授权样本的来源、实验规程参数与交接链"
+  },
   "sample": {
-    "vessel_ref": "VESSEL-DEMO",
-    "sea_area_ref": "AREA-A"
+    "voyage": {
+      "id": "VOY-2026-01",
+      "vessel_ref": "VESSEL-DEMO",
+      "sea_area_ref": "AREA-A",
+      "departure_at": "2026-09-10T08:00:00+08:00"
+    },
+    "anomaly_reading": {
+      "metric": "舱温_C",
+      "raw_value": "8.7",
+      "recorded_at": "2026-09-10T11:02:00+08:00",
+      "is_anomaly": true,
+      "anomaly_reason": "开舱取样时温度瞬时跳变，原始读数保留",
+      "reviewed_by": "李复核",
+      "review_result": "确认异常"
+    }
   }
 }

@@ -1,4 +1,66 @@
 {
-  "vessel_ref": "VESSEL-DEMO",
-  "sea_area_ref": "AREA-A"
+  "voyage": {
+    "voyage_id": "VOY-001",
+    "vessel_ref": "VESSEL-DEMO",
+    "title": "第一次海试",
+    "sea_area_ref": "AREA-A",
+    "departure_at": "2026-09-10T08:00:00+08:00",
+    "returned_at": "2026-09-12T18:00:00+08:00"
+  },
+  "leg": {
+    "leg_id": "VOY-001-L1",
+    "name": "出港航段",
+    "started_at": "2026-09-10T09:00:00+08:00",
+    "ended_at": "2026-09-10T18:00:00+08:00"
+  },
+  "instrument": {
+    "instrument_id": "I-SAMPLER",
+    "vessel_ref": "VESSEL-DEMO",
+    "name": "走航采样仪",
+    "yard_record_ref": "YARD-I-SAMPLER"
+  },
+  "certificate": {
+    "cert_id": "CERT-I-SAMPLER",
+    "cert_ref": "CAL-2026-0817",
+    "issued_by": "计量站（示例）",
+    "calibrated_at": "2026-08-01T00:00:00+08:00",
+    "valid_until": "2027-08-01T00:00:00+08:00"
+  },
+  "subject": {
+    "subject_id": "SUB-SAMPLER",
+    "code": "SUB-SAMPLER",
+    "name": "走航采样仪海况协同验证",
+    "status": "PASSED"
+  },
+  "observation_window": {
+    "window_id": "W-1",
+    "leg_id": "VOY-001-L1",
+    "started_at": "2026-09-10T10:00:00+08:00",
+    "ended_at": "2026-09-10T12:00:00+08:00",
+    "note": "四级海况走航观测"
+  },
+  "experiment_run": {
+    "run_id": "RUN-1",
+    "procedure_ref": "PROC-STD-01",
+    "params": {"speed_kn": 8, "sea_state": 4},
+    "reproducibility_note": "程序编号与参数可复现"
+  },
+  "reading": {
+    "reading_id": "R-1",
+    "metric": "salinity",
+    "raw_value": "34.71",
+    "unit": "PSU",
+    "reading_at": "2026-09-10T11:05:00+08:00",
+    "anomaly": true,
+    "reviewed_by": "INSP-EXAMPLE",
+    "review_note": "涌浪跳变，原始读数保留，复核有效"
+  },
+  "sample_handover": {
+    "sample_ref": "SAMPLE-001",
+    "from_party": "走航组",
+    "to_party": "冷藏样本舱管理员",
+    "receiver_ref": "KEEPER-EXAMPLE",
+    "handed_at": "2026-09-10T11:30:00+08:00",
+    "condition_note": "冷链温度记录正常"
+  }
 }

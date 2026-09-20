@@ -1,15 +1,73 @@
 {
-  "schema_version": "1",
-  "domain": "民资科考船试航条件闭环",
-  "required_fields": [
-    "vessel_ref",
-    "inspection_ref",
-    "sea_area_ref",
-    "warning_ref",
-    "departure_at"
-  ],
-  "time_format": "ISO 8601 with offset",
+  "schema_version": "2",
+  "domain": "科研载荷海试验收",
+  "time_format": "ISO 8601 with offset (入库归一化为 UTC)",
+  "auth": {
+    "header_role": "X-Actor-Role",
+    "header_ref": "X-Actor-Ref",
+    "roles": [
+      "coordinator (科研负责人团队：建档、关联、发放样本授权)",
+      "inspector (靠港验收人员：登记校准证书、下科目结论、补登异常复核)",
+      "researcher (研究机构：登记观测窗口/实验/读数/样本交接，按授权追溯样本)",
+      "shipowner (船东：仅查看本航次仪器交付条件)"
+    ]
+  },
+  "entities": {
+    "voyage": {
+      "required_fields": ["voyage_id", "vessel_ref", "title", "departure_at"],
+      "note": "航次是一切合格结论的隔离边界"
+    },
+    "voyage_leg": {
+      "required_fields": ["leg_id", "name", "started_at"],
+      "optional_fields": ["leg_seq", "ended_at"]
+    },
+    "instrument": {
+      "required_fields": ["instrument_id", "vessel_ref", "name"],
+      "optional_fields": ["yard_record_ref", "installed_at"],
+      "note": "yard_record_ref 为船厂港口单机合格记录，仅作来源材料，不构成海试结论"
+    },
+    "calibration_certificate": {
+      "required_fields": ["cert_id", "cert_ref", "calibrated_at", "valid_until"],
+      "rule": "证书有效期必须覆盖观测窗口起止时间，否则科目不得判合格"
+    },
+    "subject": {
+      "required_fields": ["subject_id", "code", "name"],
+      "status_values": ["PENDING", "PASSED", "RETEST_REQUIRED"],
+      "rule": "RETEST_REQUIRED 必填 retest_reason；PASSED 需本航次观测窗口、可复现实验记录、读数且异常读数全部复核、关联仪器校准有效"
+    },
+    "observation_window": {
+      "required_fields": ["window_id", "leg_id", "started_at", "ended_at"],
+      "rule": "航段必须与科目属于同一航次，跨航次挂接返回 409"
+    },
+    "experiment_run": {
+      "required_fields": ["run_id", "procedure_ref"],
+      "reproducibility_fields": ["procedure_ref", "params", "operator_ref", "recorded_at", "reproducibility_note"]
+    },
+    "reading": {
+      "required_fields": ["reading_id", "metric", "raw_value", "reading_at"],
+      "optional_fields": ["unit", "anomaly", "reviewed_by", "review_note"],
+      "rule": "raw_value 只增不改；anomaly=true 的读数在判合格前必须经 /readings/{id}/review 补登复核人"
+    },
+    "sample": {
+      "required_fields": ["sample_id", "sample_ref", "collected_at"]
+    },
+    "sample_handover": {
+      "required_fields": ["handover_id", "from_party", "to_party", "receiver_ref", "handed_at"],
+      "note": "按 handover_seq 形成冷藏样本舱交接链"
+    },
+    "sample_access_grant": {
+      "required_fields": ["grant_id", "institution_ref", "granted_by"],
+      "rule": "无授权机构查询样本来源返回 403"
+    }
+  },
+  "views": {
+    "GET /voyages/{id}/delivery": "船东视图：逐仪器 delivery_ready 布尔值，不含观测数据",
+    "GET /voyages/{id}/acceptance": "验收视图：仪器 → 科目 → 完成验证的航段与观测时间、结论、复测原因",
+    "GET /samples/{ref}/provenance": "研究机构授权视图：来源航次/科目/可复现实验要素与交接链",
+    "GET /samples/{ref}/readings": "授权视图附加原始读数、异常标记与复核人"
+  },
   "sample": {
+    "voyage_id": "VOY-001",
     "vessel_ref": "VESSEL-DEMO",
     "sea_area_ref": "AREA-A"
   }
